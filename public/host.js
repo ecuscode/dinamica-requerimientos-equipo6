@@ -80,6 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnGlobalReset) {
     btnGlobalReset.addEventListener('click', triggerReset);
   }
+
+  function showView(name) {
     Object.keys(views).forEach(k => {
       views[k].classList.remove('active');
     });
@@ -173,7 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyState(data) {
     currentState = data;
 
-    if (data.joinUrl) {
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      joinUrlText.textContent = window.location.origin;
+    } else if (data.joinUrl) {
       joinUrlText.textContent = data.joinUrl;
     }
 

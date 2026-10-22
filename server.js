@@ -21,7 +21,8 @@ function getLocalIp() {
 }
 
 const LOCAL_IP = getLocalIp();
-const JOIN_URL = process.env.RENDER_EXTERNAL_URL || process.env.PUBLIC_URL || `http://${LOCAL_IP}:${PORT}`;
+const RENDER_HOSTNAME = process.env.RENDER_EXTERNAL_HOSTNAME;
+const JOIN_URL = RENDER_HOSTNAME ? `https://${RENDER_HOSTNAME}` : (process.env.RENDER_EXTERNAL_URL || process.env.PUBLIC_URL || `http://${LOCAL_IP}:${PORT}`);
 
 // Banco de Casos de Inspección (Temas 3.2, 3.3 y 3.4)
 const QUESTIONS = [
