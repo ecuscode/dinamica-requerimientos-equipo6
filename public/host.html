@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Control — Protocolo de Inspección de Requerimientos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Barra Institucional -->
+  <header class="institutional-bar">
+    <div class="tags">
+      <span>IPN — UPIICSA</span>
+      <span class="badge-tag">GRUPO 3NV30</span>
+      <span class="badge-tag">EQUIPO 6</span>
+    </div>
+    <div>
+      <span>INGENIERÍA DE REQUERIMIENTOS — SIMULACIÓN INDUSTRIAL</span>
+    </div>
+  </header>
+
+  <!-- Escenario Central -->
+  <main class="main-stage">
+
+    <!-- 1. VISTA DE LOBBY -->
+    <section id="view-lobby" class="view-panel active">
+      <div class="panel-card lobby-layout">
+        <div style="text-align: center;">
+          <div id="qr-container" class="qr-box">
+            <!-- QR generado dinámicamente -->
+            <div style="color: #64748b; font-family: var(--font-mono); font-size: 0.8rem;">Cargando código de acceso...</div>
+          </div>
+          <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); margin-top: 0.8rem;">
+            Escanea con la cámara del celular para unirte
+          </p>
+        </div>
+
+        <div class="lobby-info">
+          <div>
+            <h1 class="title-large">Protocolo de Inspección de Requerimientos</h1>
+            <p class="subtitle">Evaluación de Artefactos RAD, Reglas de Negocio en DMN y Gobernanza Ágil</p>
+          </div>
+
+          <div class="connection-banner">
+            Acceso directo: <span id="join-url-text">http://localhost:3000</span>
+          </div>
+
+          <div class="players-status-box">
+            <div class="player-count-title">
+              Inspectores Registrados: <span id="player-count" style="color: #ffffff; font-weight: 700;">0</span>
+            </div>
+            <div id="player-chips-list" class="player-chips">
+              <!-- Chips de inspectores que se unen -->
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+            <button id="btn-start" class="btn btn-primary" style="flex: 1;">
+              Iniciar Sesión de Inspección
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. VISTA DE CASO ACTIVO -->
+    <section id="view-question" class="view-panel">
+      <div class="panel-card">
+        <div class="case-header">
+          <div class="case-meta">
+            <span id="case-eje" class="case-eje">TEMA DE EVALUACIÓN</span>
+            <h2 id="case-title" class="case-title">Título del Caso</h2>
+          </div>
+          <div class="timer-box">
+            <span id="timer-display" class="timer-num">25</span>
+            <span class="timer-label">Segundos</span>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div id="case-story" class="user-story-quote">"Historia de usuario..."</div>
+          <div id="case-context" class="technical-context">Contexto técnico y diagnóstico...</div>
+        </div>
+
+        <div id="case-dilemma" class="dilemma-title">¿Qué disposición técnica corresponde aplicar?</div>
+
+        <div class="gate-options-grid">
+          <div class="gate-card gate-go">
+            <span class="gate-tag">[ GO ] Aprobación</span>
+            <div id="opt-go-desc" class="gate-desc">Descripción GO</div>
+          </div>
+          <div class="gate-card gate-pivot">
+            <span class="gate-tag">[ PIVOT ] Redirección</span>
+            <div id="opt-pivot-desc" class="gate-desc">Descripción PIVOT</div>
+          </div>
+          <div class="gate-card gate-kill">
+            <span class="gate-tag">[ KILL ] Bloqueo</span>
+            <div id="opt-kill-desc" class="gate-desc">Descripción KILL</div>
+          </div>
+        </div>
+
+        <div class="progress-counter-bar">
+          <div>
+            Caso <span id="current-q-num">1</span> de <span id="total-q-num">6</span>
+          </div>
+          <div>
+            Dictámenes recibidos: <span id="votes-count" style="color: var(--accent-cyan); font-weight: 700;">0</span> / <span id="total-voters">0</span>
+          </div>
+          <div>
+            <button id="btn-force-close" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;">
+              Cerrar Compuerta
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. VISTA DE RESOLUCIÓN -->
+    <section id="view-resolution" class="view-panel">
+      <div class="panel-card">
+        <div class="case-header">
+          <div class="case-meta">
+            <span class="case-eje">Dictamen Oficial de Ingeniería</span>
+            <h2 id="res-title" class="case-title">Resolución Técnica</h2>
+          </div>
+          <div>
+            <span id="correct-gate-badge" class="correct-badge GO">COMPUERTA GO</span>
+          </div>
+        </div>
+
+        <!-- Distribución de Votos -->
+        <div class="vote-distribution">
+          <div class="vote-col">
+            <div class="vote-label-row">
+              <span style="color: var(--go-color); font-weight: 600;">[ GO ]</span>
+              <span id="stat-go-pct">0% (0)</span>
+            </div>
+            <div class="meter-track">
+              <div id="stat-go-bar" class="meter-fill GO" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div class="vote-col">
+            <div class="vote-label-row">
+              <span style="color: var(--pivot-color); font-weight: 600;">[ PIVOT ]</span>
+              <span id="stat-pivot-pct">0% (0)</span>
+            </div>
+            <div class="meter-track">
+              <div id="stat-pivot-bar" class="meter-fill PIVOT" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div class="vote-col">
+            <div class="vote-label-row">
+              <span style="color: var(--kill-color); font-weight: 600;">[ KILL ]</span>
+              <span id="stat-kill-pct">0% (0)</span>
+            </div>
+            <div class="meter-track">
+              <div id="stat-kill-bar" class="meter-fill KILL" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Justificación teórica -->
+        <div class="resolution-box">
+          <h3 style="font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-cyan); margin-bottom: 0.6rem; font-family: var(--font-mono);">
+            Sustento Teórico y Metodológico
+          </h3>
+          <p id="justification-content" class="justification-text">
+            Justificación...
+          </p>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+          <button id="btn-show-scores" class="btn btn-primary">
+            Ver Clasificación de Inspectores
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. VISTA DE CLASIFICACIÓN (LEADERBOARD) -->
+    <section id="view-leaderboard" class="view-panel">
+      <div class="panel-card">
+        <div class="case-header">
+          <div class="case-meta">
+            <span class="case-eje">Desempeño Acumulado</span>
+            <h2 class="case-title">Clasificación de la Célula de Inspección</h2>
+          </div>
+        </div>
+
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">Pos</th>
+              <th>Inspector</th>
+              <th style="text-align: right; width: 140px;">Puntaje</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-rows">
+            <!-- Filas generadas dinámicamente -->
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+          <button id="btn-next-question" class="btn btn-primary">
+            Siguiente Caso
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. VISTA DE PODIO FINAL -->
+    <section id="view-podium" class="view-panel">
+      <div class="panel-card" style="text-align: center;">
+        <span class="case-eje" style="margin-bottom: 0.5rem; display: block;">Sesión Concluida</span>
+        <h2 class="title-large" style="margin-bottom: 2rem;">Dictaminadores de Requerimientos Destacados</h2>
+
+        <div class="podium-container">
+          <!-- Segundo Lugar -->
+          <div class="podium-pedestal podium-second">
+            <div id="podium-p2-name" class="podium-name">—</div>
+            <div id="podium-p2-score" class="podium-score">0 pts</div>
+            <div class="podium-block">2</div>
+          </div>
+
+          <!-- Primer Lugar -->
+          <div class="podium-pedestal podium-first">
+            <div id="podium-p1-name" class="podium-name">—</div>
+            <div id="podium-p1-score" class="podium-score">0 pts</div>
+            <div class="podium-block">1</div>
+          </div>
+
+          <!-- Tercer Lugar -->
+          <div class="podium-pedestal podium-third">
+            <div id="podium-p3-name" class="podium-name">—</div>
+            <div id="podium-p3-score" class="podium-score">0 pts</div>
+            <div class="podium-block">3</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+          <button id="btn-reset-session" class="btn btn-outline">
+            Reiniciar Sesión
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="host.js"></script>
+</body>
+</html>

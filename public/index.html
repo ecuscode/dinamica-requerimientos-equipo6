@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Célula de Inspección — Requerimientos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="justify-content: flex-start; padding: 0.5rem;">
+
+  <!-- Barra móvil superior -->
+  <header class="institutional-bar" style="border-radius: 6px; margin-bottom: 0.8rem; padding: 0.5rem 1rem;">
+    <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-cyan);">
+      IPN · UPIICSA · 3NV30
+    </div>
+    <div id="player-status-badge" style="font-family: var(--font-mono); font-size: 0.75rem; color: #ffffff;">
+      <!-- Se llena con el nombre y score -->
+      Desconectado
+    </div>
+  </header>
+
+  <main class="mobile-wrapper" style="margin: 0 auto;">
+
+    <!-- 1. REGISTRO DE INSPECTOR -->
+    <section id="pview-join" class="mobile-card active">
+      <span class="badge-tag" style="margin-bottom: 0.5rem; display: inline-block;">Acceso a Dinámica</span>
+      <h2 style="font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;">
+        Célula de Inspección de Requerimientos
+      </h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.2rem;">
+        Ingresa tu nombre o apellido para registrarte como dictaminador en la sesión del Equipo 6.
+      </p>
+
+      <div class="input-group">
+        <label for="input-nickname" class="input-label">Nombre o Alias</label>
+        <input type="text" id="input-nickname" class="text-input" placeholder="Ej. Carlos M." maxlength="18" autocomplete="off">
+      </div>
+
+      <button id="btn-join" class="btn btn-primary" style="width: 100%;">
+        Unirse a la Sesión
+      </button>
+    </section>
+
+    <!-- 2. ESPERA EN LOBBY -->
+    <section id="pview-lobby" class="mobile-card" style="display: none; text-align: center;">
+      <div class="status-indicator" style="margin: 1rem auto;"></div>
+      <h3 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 0.4rem;">Registrado en la Célula</h3>
+      <p id="lobby-greeting" style="font-family: var(--font-mono); font-size: 0.95rem; color: var(--accent-cyan); margin-bottom: 1rem;">
+        Inspector: —
+      </p>
+      <div style="background: var(--bg-surface); padding: 1rem; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.85rem; color: var(--text-muted); text-align: left; line-height: 1.5;">
+        Los casos se proyectarán en la pantalla del aula. Al abrirse cada compuerta, dispondrás de 25 segundos para elegir:
+        <ul style="margin-top: 0.5rem; padding-left: 1.2rem; font-family: var(--font-mono); font-size: 0.8rem;">
+          <li><strong style="color: var(--go-color);">[ GO ]</strong> Aprobación</li>
+          <li><strong style="color: var(--pivot-color);">[ PIVOT ]</strong> Redirección a reglas</li>
+          <li><strong style="color: var(--kill-color);">[ KILL ]</strong> Bloqueo por calidad</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3. CASO ACTIVO / BOTONES DE DECISIÓN -->
+    <section id="pview-question" class="mobile-card" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem; margin-bottom: 0.8rem;">
+        <span id="p-case-tag" style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-cyan); text-transform: uppercase;">CASO ACTIVO</span>
+        <span id="p-timer" style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; color: #ffffff;">25s</span>
+      </div>
+
+      <div style="font-size: 0.92rem; font-weight: 600; color: #ffffff; margin-bottom: 0.5rem;" id="p-case-title">
+        Título del Caso
+      </div>
+
+      <div class="decision-buttons-stack">
+        <button class="btn-decision btn-decision-go" data-choice="GO">
+          <span class="badge">[ GO ]</span>
+          <span class="caption">Aprobación a desarrollo</span>
+        </button>
+
+        <button class="btn-decision btn-decision-pivot" data-choice="PIVOT">
+          <span class="badge">[ PIVOT ]</span>
+          <span class="caption">Redirección a reglas / JAD</span>
+        </button>
+
+        <button class="btn-decision btn-decision-kill" data-choice="KILL">
+          <span class="badge">[ KILL ]</span>
+          <span class="caption">Bloqueo / Cancelación</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4. DICTAMEN ENVIADO -->
+    <section id="pview-submitted" class="mobile-card" style="display: none;">
+      <div class="submitted-notice">
+        <div class="status-indicator"></div>
+        <h3 style="font-size: 1.15rem; color: #ffffff;">Dictamen Registrado</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Tu elección fue transmitida al servidor central. Esperando el cierre de la compuerta...
+        </p>
+      </div>
+    </section>
+
+    <!-- 5. RESULTADO DE RONDA -->
+    <section id="pview-result" class="mobile-card" style="display: none; text-align: center;">
+      <div id="p-result-badge" class="correct-badge" style="margin: 0.5rem auto 1rem auto;">
+        RESULTADO
+      </div>
+
+      <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff; margin-bottom: 0.3rem;" id="p-points-awarded">
+        +0 pts
+      </div>
+
+      <p id="p-result-msg" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem;">
+        Mensaje...
+      </p>
+
+      <div style="background: var(--bg-surface); padding: 0.8rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.85rem; display: flex; justify-content: space-around;">
+        <div>Puntos: <strong id="p-total-score" style="color: #ffffff;">0</strong></div>
+        <div>Racha: <strong id="p-streak" style="color: var(--accent-cyan);">0</strong></div>
+      </div>
+    </section>
+
+    <!-- 6. CIERRE DE SESIÓN -->
+    <section id="pview-finish" class="mobile-card" style="display: none; text-align: center; padding: 2rem 1rem;">
+      <span class="case-eje" style="margin-bottom: 0.5rem; display: block;">Simulación Finalizada</span>
+      <h2 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 0.8rem;">Inspección Concluida</h2>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.2rem;">
+        Revisa los resultados y el podio de dictaminadores en la pantalla del proyector.
+      </p>
+      <div style="background: var(--bg-surface); padding: 1rem; border-radius: 6px; font-family: var(--font-mono); font-size: 1rem; color: #ffffff;">
+        Tu Puntaje Final: <strong id="p-final-score" style="color: var(--accent-cyan);">0</strong> pts
+      </div>
+    </section>
+
+  </main>
+
+  <script src="player.js"></script>
+</body>
+</html>
