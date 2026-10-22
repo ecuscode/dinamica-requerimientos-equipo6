@@ -5,6 +5,7 @@ const os = require('os');
 const QRCode = require('qrcode');
 
 const PORT = process.env.PORT || 3000;
+const HOST_PASSWORD = process.env.HOST_PASSWORD || 'ice1234';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // Obtener la IP local de red para que los celulares se conecten si es en local
@@ -393,6 +394,35 @@ const server = http.createServer((req, res) => {
   // API REST: Controles de Administrador (Host)
   if (req.method === 'POST' && pathname.startsWith('/api/host/')) {
     const action = pathname.replace('/api/host/', '');
+
+    // Endpoint de autenticación con contraseña
+    if (action === 'auth') {
+      let body = '';
+      req.on('data', chunk => { body += chunk; });
+      req.on('end', () => {
+        try {
+          const { password } = JSON.parse(body);
+          if (password === HOST_PASSWORD) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ success: true, token: HOST_PASSWORD }));
+          } else {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ success: false, error: 'Clave de acceso incorrecta' }));
+          }
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, error: 'Petición inválida' }));
+        }
+      });
+      return;
+    }
+
+    // Proteger todas las demás acciones de facilitación
+    const clientKey = req.headers['x-host-key'] || req.headers['authorization'];
+    if (clientKey !== HOST_PASSWORD) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ success: false, error: 'Acceso no autorizado al panel de control' }));
+    }
 
     if (action === 'start') {
       gameState.currentQuestionIndex = 0;

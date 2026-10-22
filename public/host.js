@@ -4,12 +4,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Elementos del DOM
   const views = {
+    auth: document.getElementById('view-auth'),
     lobby: document.getElementById('view-lobby'),
     question: document.getElementById('view-question'),
     resolution: document.getElementById('view-resolution'),
     leaderboard: document.getElementById('view-leaderboard'),
     podium: document.getElementById('view-podium')
   };
+
+  // Autenticación
+  const formAuth = document.getElementById('form-auth');
+  const inputHostPassword = document.getElementById('input-host-password');
+  const authErrorMsg = document.getElementById('auth-error-msg');
+  let hostToken = sessionStorage.getItem('req_host_token') || null;
+
+  function apiHost(endpoint, options = {}) {
+    return fetch(`/api/host/${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-host-key': hostToken,
+        ...(options.headers || {})
+      }
+    }).then(res => {
+      if (res.status === 401) {
+        sessionStorage.removeItem('req_host_token');
+        hostToken = null;
+        showView('auth');
+        throw new Error('No autorizado');
+      }
+      return res.json();
+    });
+  }
 
   const qrContainer = document.getElementById('qr-container');
   const joinUrlText = document.getElementById('join-url-text');
@@ -72,14 +98,46 @@ document.addEventListener('DOMContentLoaded', () => {
       "• CANCELAR: Mantiene a los alumnos registrados en la sala pero con 0 puntos."
     );
 
-    const url = clearParticipants ? '/api/host/reset?clear_players=true' : '/api/host/reset';
-    fetch(url, { method: 'POST' }).catch(console.error);
+    const action = clearParticipants ? 'reset?clear_players=true' : 'reset';
+    apiHost(action, { method: 'POST' }).catch(console.error);
   }
 
   btnResetSession.addEventListener('click', triggerReset);
   if (btnGlobalReset) {
     btnGlobalReset.addEventListener('click', triggerReset);
   }
+
+  // Manejador del formulario de autenticación
+  formAuth.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const pass = inputHostPassword.value.trim();
+    authErrorMsg.style.display = 'none';
+
+    fetch('/api/host/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pass })
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          hostToken = data.token;
+          sessionStorage.setItem('req_host_token', hostToken);
+          if (currentState) {
+            applyState(currentState);
+          } else {
+            showView('lobby');
+          }
+        } else {
+          authErrorMsg.style.display = 'block';
+          inputHostPassword.value = '';
+          inputHostPassword.focus();
+        }
+      })
+      .catch(() => {
+        authErrorMsg.style.display = 'block';
+      });
+  });
 
   function showView(name) {
     Object.keys(views).forEach(k => {
@@ -174,6 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyState(data) {
     currentState = data;
+
+    if (!hostToken) {
+      showView('auth');
+      return;
+    }
 
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       joinUrlText.textContent = window.location.origin;
@@ -271,18 +334,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handlers de botones
   btnStart.addEventListener('click', () => {
-    fetch('/api/host/start', { method: 'POST' }).catch(console.error);
+    apiHost('start', { method: 'POST' }).catch(console.error);
   });
 
   btnForceClose.addEventListener('click', () => {
-    fetch('/api/host/close_gate', { method: 'POST' }).catch(console.error);
+    apiHost('close_gate', { method: 'POST' }).catch(console.error);
   });
 
   btnShowScores.addEventListener('click', () => {
-    fetch('/api/host/show_leaderboard', { method: 'POST' }).catch(console.error);
+    apiHost('show_leaderboard', { method: 'POST' }).catch(console.error);
   });
 
   btnNextQuestion.addEventListener('click', () => {
-    fetch('/api/host/next', { method: 'POST' }).catch(console.error);
+    apiHost('next', { method: 'POST' }).catch(console.error);
   });
 });
