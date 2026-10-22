@@ -126,7 +126,14 @@ document.addEventListener('DOMContentLoaded', () => {
       currentScore = 0;
       currentStreak = 0;
       updateBadge();
-      showPView('lobby');
+      if (state.playerCount === 0) {
+        // Se limpiaron los participantes; volver a pantalla de ingreso
+        localStorage.removeItem('req_player_id');
+        playerId = null;
+        showPView('join');
+      } else {
+        showPView('lobby');
+      }
     } else if (state.status === 'QUESTION') {
       hasAnsweredCurrent = false;
       showPView('question');

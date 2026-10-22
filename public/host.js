@@ -57,8 +57,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnShowScores = document.getElementById('btn-show-scores');
   const btnNextQuestion = document.getElementById('btn-next-question');
   const btnResetSession = document.getElementById('btn-reset-session');
+  const btnGlobalReset = document.getElementById('btn-global-reset');
 
-  function showView(name) {
+  function triggerReset() {
+    const wipe = confirm(
+      "¿Deseas reiniciar la dinámica?\n\n" +
+      "• Presiona ACEPTAR para volver al Lobby y poner los puntajes en 0."
+    );
+    if (!wipe) return;
+
+    const clearParticipants = confirm(
+      "¿Deseas también borrar a los participantes de la lista?\n\n" +
+      "• ACEPTAR: Expulsa a todos los usuarios registrados (ideal para limpiar pruebas).\n" +
+      "• CANCELAR: Mantiene a los alumnos registrados en la sala pero con 0 puntos."
+    );
+
+    const url = clearParticipants ? '/api/host/reset?clear_players=true' : '/api/host/reset';
+    fetch(url, { method: 'POST' }).catch(console.error);
+  }
+
+  btnResetSession.addEventListener('click', triggerReset);
+  if (btnGlobalReset) {
+    btnGlobalReset.addEventListener('click', triggerReset);
+  }
     Object.keys(views).forEach(k => {
       views[k].classList.remove('active');
     });
@@ -259,11 +280,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnNextQuestion.addEventListener('click', () => {
     fetch('/api/host/next', { method: 'POST' }).catch(console.error);
-  });
-
-  btnResetSession.addEventListener('click', () => {
-    if (confirm('¿Deseas reiniciar la sesión de inspección?')) {
-      fetch('/api/host/reset', { method: 'POST' }).catch(console.error);
-    }
   });
 });

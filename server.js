@@ -444,14 +444,22 @@ const server = http.createServer((req, res) => {
       gameState.currentQuestionIndex = -1;
       gameState.timeRemaining = 0;
       gameState.answers.clear();
-      for (const p of gameState.players.values()) {
-        p.score = 0;
-        p.streak = 0;
-        p.lastAnswer = null;
+
+      const clearPlayers = parsedUrl.searchParams.get('clear_players') === 'true';
+      if (clearPlayers) {
+        gameState.players.clear();
+        broadcast("player_joined", { playerCount: 0, players: [] });
+      } else {
+        for (const p of gameState.players.values()) {
+          p.score = 0;
+          p.streak = 0;
+          p.lastAnswer = null;
+        }
       }
+
       broadcast("state_change", getPublicState());
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ success: true }));
+      return res.end(JSON.stringify({ success: true, cleared: clearPlayers }));
     }
   }
 
